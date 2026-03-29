@@ -1,0 +1,10 @@
+{
+  "name": "web-push-for-codex",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "check": "node --check backend/src/server.js && node --check scripts/codex_webpush_notify.js"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Codex Alerts",
+  "short_name": "CodexAlerts",
+  "display": "standalone",
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#1d4ed8",
+  "icons": []
+}
