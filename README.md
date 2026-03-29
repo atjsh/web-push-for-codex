@@ -2,6 +2,8 @@
 
 Minimal implementation for Codex turn completion alerts delivered over Web Push to a PWA.
 
+> **[🇰🇷 한국어 버전](#web-push-for-codex-한국어)**
+
 ## Components
 
 - `backend/src/server.js`: HTTP API with subscribe, event ingest, and run status page.
