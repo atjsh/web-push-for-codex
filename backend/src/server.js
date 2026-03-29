@@ -17,6 +17,7 @@ const publicDir = path.resolve(__dirname, '../../pwa/public');
 
 const PORT = Number(process.env.PORT ?? 3000);
 const CODEX_NOTIFY_TOKEN = process.env.CODEX_NOTIFY_TOKEN ?? 'dev-token';
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY ?? '';
 
 function jsonResponse(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -160,7 +161,12 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && req.url === '/') {
-      serveStaticFile(res, path.join(publicDir, 'index.html'));
+      const html = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf8');
+      const injected = html.replace(
+        '<head>',
+        `<head><script>window.__VAPID_PUBLIC_KEY__=${JSON.stringify(VAPID_PUBLIC_KEY)};</script>`
+      );
+      htmlResponse(res, 200, injected);
       return;
     }
 
