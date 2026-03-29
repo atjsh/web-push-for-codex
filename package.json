@@ -1,0 +1,15 @@
+{
+  "name": "web-push-for-codex",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node backend/src/index.js",
+    "check": "node --check backend/src/index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^4.21.2",
+    "web-push": "^3.6.7"
+  }
+}
