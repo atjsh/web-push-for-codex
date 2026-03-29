@@ -90,6 +90,12 @@ export function deactivateSubscription(endpoint) {
   }
 }
 
+export function clearSubscriptions() {
+  const data = readStore();
+  data.subscriptions = [];
+  writeStore(data);
+}
+
 export function findRunByToken(runToken) {
   const data = readStore();
   return data.runs.find((item) => item.runToken === runToken) ?? null;

@@ -3,6 +3,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
+  clearSubscriptions,
   createRun,
   deactivateSubscription,
   findRunByToken,
@@ -18,6 +19,7 @@ const publicDir = path.resolve(__dirname, '../../pwa/public');
 const PORT = Number(process.env.PORT ?? 3000);
 const CODEX_NOTIFY_TOKEN = process.env.CODEX_NOTIFY_TOKEN ?? 'dev-token';
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY ?? '';
+const ALLOWED_UA_PATTERN = process.env.ALLOWED_UA_PATTERN ?? 'iPhone';
 
 function jsonResponse(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -130,9 +132,31 @@ async function handleCodexEvent(req, res) {
   jsonResponse(res, 200, { ok: true, runToken: run.runToken });
 }
 
+function isAllowedUA(req) {
+  if (!ALLOWED_UA_PATTERN) return true;
+  const ua = req.headers['user-agent'] ?? '';
+  return new RegExp(ALLOWED_UA_PATTERN).test(ua);
+}
+
 const server = http.createServer(async (req, res) => {
   try {
+    const isApiEvent = req.method === 'POST' && req.url === '/api/codex/event';
+    if (!isApiEvent && !isAllowedUA(req)) {
+      res.writeHead(404);
+      res.end();
+      return;
+    }
+
     if (req.method === 'POST' && req.url === '/api/push/subscribe') {
+      const existing = listActiveSubscriptions();
+      if (existing.length > 0) {
+        jsonResponse(res, 409, {
+          ok: false,
+          error: 'subscription_exists',
+          message: 'A notification subscription already exists. Run "npm run clear-tokens" on the server to allow new registrations.'
+        });
+        return;
+      }
       const body = await readBody(req);
       if (!body?.endpoint || !body?.keys?.p256dh || !body?.keys?.auth) {
         jsonResponse(res, 400, { ok: false, error: 'invalid subscription' });

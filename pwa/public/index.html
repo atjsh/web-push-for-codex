@@ -45,11 +45,17 @@
           applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
         });
 
-        await fetch('/api/push/subscribe', {
+        const res = await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(subscription)
         });
+
+        if (!res.ok) {
+          const err = await res.json();
+          status.textContent = err.message || 'Subscription failed.';
+          return;
+        }
 
         status.textContent = 'Notifications enabled.';
       }
